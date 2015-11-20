@@ -9,12 +9,13 @@ Maps are built on a cartesian grid.  Each cell in the grid defines its own conte
 
 # A lot of base code copied from my earlier SoC project.
 # ??? is a searchable string for later lookup for things I know are needed but whose exact use is unclear.
+# "coord" and "coordinates" refer to the MapCell coordinates, while "top" and "left" and "width" etc. refer to pixel coordinates.
 
 try:
     import os
     import sys
     import pygame
-    from pygame.locals import QUIT, KEYUP, K_ESCAPE
+    from pygame.locals import QUIT, KEYUP, K_ESCAPE, RESIZABLE
     #from pygame.locals import *     # Bad form, should import only needed items for clarity
 except ImportError as err:
     print "Could not load module: %s" % (err)
@@ -41,6 +42,10 @@ GOLD    = (127, 127,   0)
 BROWN   = (191,  63,  63)
 LTBROWN = (255, 207,  71)
 
+NONE = 0
+SINGLE = 1
+BOTH = 2
+
 FPS = 24
 
 def terminate():
@@ -57,12 +62,15 @@ def main():
     screenHeight = opts.cellHeight * (theMap.numCellsY + opts.wraparoundRepeat * 2 + opts.coordDisplay)
 
     pygame.init()
-    screen = pygame.display.set_mode((screenWidth, screenHeight), 0, 32)
+    screen = pygame.display.set_mode((screenWidth, screenHeight), RESIZABLE, 32)
     pygame.display.set_caption("MapMaker BT by CanuckMonkey Games")
     background = pygame.Surface(screen.get_size())
     background = background.convert()
     overlay = pygame.Surface(screen.get_size())     # Don't know for sure the purpose of this vs. background???
     overlay = screen.convert_alpha()
+    theMap.draw(background)
+    screen.blit(background, (0, 0))
+    pygame.display.flip()
 
     clock = pygame.time.Clock()
 
@@ -84,7 +92,11 @@ def main():
         # Update program state
 
         # Draw/render
-        # AFTER drawing everything, flip the display
+        overlay.fill((0, 0, 0, 0))
+        theMap.draw(overlay)
+        screen.blit(overlay, (0, 0))
+
+        # *After* drawing everything, flip the display
         pygame.display.flip()
 
 class Options():
@@ -92,9 +104,9 @@ class Options():
 
     def __init__(self):
         self.wraparound = True
-        self.coordDisplay = 2
-        self.cellWidth = 36
-        self.cellHeight = 36
+        self.coordDisplay = BOTH
+        self.cellWidth = 32
+        self.cellHeight = 32
         self.wraparoundRepeat = 1
         self.wallThickness = 0.05
         self.gridlineThickness = 0.02
@@ -105,8 +117,9 @@ class Options():
 class MapCell():
     """Define a single cell of the map."""
 
-    def __init__(self, opts=Options(), coords=(0, 0)):
+    def __init__(self, opts=Options(), coords=(0, 0), topleft=(0, 0)):
         self.coords = coords
+        self.topleft = topleft
         self.darkness = False
         self.spinner = False
         self.antiMagic = False
@@ -118,12 +131,19 @@ class MapCell():
         self.opts = opts
         self.width = opts.cellWidth
         self.height = opts.cellHeight
+        self.rect = pygame.Rect(self.topleft, (self.width, self.height))
 
     def draw(self, surface, left=(), top=()):
+        """Draw the MapCell onto the surface."""
+        if not left:
+            left = self.rect.left
+        if not top:
+            top = self.rect.top
         if self.explored == False:
-            bgcolour = opts.bgcolours['default']
-        pass    # Work in progress
-
+            bgcolour = self.opts.bgcolours['default']
+        else:
+            bgcolour = BLACK
+        myRect = pygame.draw.rect(surface, bgcolour, (left, top, self.width, self.height))
 
 class Map():
     """Define one complete map."""
@@ -133,21 +153,32 @@ class Map():
         self.numCellsX = opts.numCellsX
         self.numCellsY = opts.numCellsY
         self.map = [None] * self.numCellsX
-        for i in range(self.numCellsX):
-            self.map[i] = [None] * self.numCellsY
+        self.offsetTop = opts.coordDisplay ** 0 * opts.cellHeight
+        self.offsetLeft = opts.coordDisplay ** 0 * opts.cellWidth
+        if self.opts.wraparound == True:
+            self.offsetTop += opts.wraparoundRepeat * opts.cellHeight
+            self.offsetLeft += opts.wraparoundRepeat * opts.cellWidth
+
+        #for i in range(self.numCellsX):
+        #    self.map[i] = [None] * self.numCellsY
+        self.map = []
         for x in range(self.numCellsX):
+            self.map.append([])
             for y in range(self.numCellsY):
-                self.map[x][y] = MapCell(self.opts, (x, y))
+                locX = self.offsetLeft + x * opts.cellWidth
+                locY = self.offsetTop + y * opts.cellHeight
+                self.map[x].append(MapCell(self.opts, coords=(x, y), topleft=(locX, locY)))
 
     def draw(self, surface):
-        top = opts.coordDisplay ** 0 * opts.cellHeight
-        left = opts.coordDisplay ** 0 * opts.cellWidth
-        if opts.wraparound == True:
-            top += opts.wraparoundRepeat * opts.cellHeight
-            left += opts.wraparoundRepeat * opts.cellWidth
+        offsetTop = self.opts.coordDisplay ** 0 * self.opts.cellHeight
+        offsetLeft = self.opts.coordDisplay ** 0 * self.opts.cellWidth
+        if self.opts.wraparound == True:
+            self.offsetTop += self.opts.wraparoundRepeat * self.opts.cellHeight
+            self.offsetLeft += self.opts.wraparoundRepeat * self.opts.cellWidth
         for x in range(self.numCellsX):
             for y in range(self.numCellsY):
-                self.map[x][y].draw(surface, left=(left + x * opts.cellWidth), top=(top + y * opts.cellHeight))
+                self.map[x][y].draw(surface)
+                #self.map[x][y].draw(surface, left=(self.offsetLeft + x * self.opts.cellWidth), top=(self.offsetTop + y * self.opts.cellHeight))
 
-if __name__ == "__main__":      # Do not run this if called from some other module, I think???
+if __name__ == "__main__":      # Do not run this if called from some other module???
     main()
