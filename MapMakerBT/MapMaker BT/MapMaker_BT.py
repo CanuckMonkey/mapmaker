@@ -14,6 +14,7 @@ try:
     import os
     import sys
     import pygame
+    from pygame.locals import QUIT, KEYUP, K_ESCAPE
     #from pygame.locals import *     # Bad form, should import only needed items for clarity
 except ImportError as err:
     print "Could not load module: %s" % (err)
@@ -21,8 +22,7 @@ except ImportError as err:
 
 if not pygame.font: print "Warning: fonts disabled."
 
-""" Colour Constants """
-
+# Define useful colours
 WHITE   = (255, 255, 255)
 BLACK   = (  0,   0,   0)
 GRAY    = (127, 127, 127)
@@ -41,15 +41,22 @@ GOLD    = (127, 127,   0)
 BROWN   = (191,  63,  63)
 LTBROWN = (255, 207,  71)
 
+FPS = 24
+
+def terminate():
+    """End the program cleanly."""
+    pygame.quit()
+    sys.exit(0)
+
 def main():
     """Run the program."""
-    pygame.init()
     opts = Options()
     theMap = Map(opts)
 
-    screenWidth = opts.cellWidth * (theMap.width + opts.wraparoundRepeat * 2 + opts.coordDisplay)
-    screenHeight = opts.cellHeight * (theMap.height + opts.wraparoundRepeat * 2 + opts.coordDisplay)
+    screenWidth = opts.cellWidth * (theMap.numCellsX + opts.wraparoundRepeat * 2 + opts.coordDisplay)
+    screenHeight = opts.cellHeight * (theMap.numCellsY + opts.wraparoundRepeat * 2 + opts.coordDisplay)
 
+    pygame.init()
     screen = pygame.display.set_mode((screenWidth, screenHeight), 0, 32)
     pygame.display.set_caption("MapMaker BT by CanuckMonkey Games")
     background = pygame.Surface(screen.get_size())
@@ -59,16 +66,26 @@ def main():
 
     clock = pygame.time.Clock()
 
+    running = True
 
-    while True:     # Loop while program is running
-        clock.tick(60)     # What does this do???
+    # Loop while program is running
+    while running:
+        # Control maximum framrate
+        clock.tick(FPS)
 
+        # Process input
         for event in pygame.event.get():
-            if event.type == QUIT:
+            if event.type == QUIT:      #
                 terminate()
-            if event.type == KEYUP:
-                if event.key == K_ESCAPE:
-                    terminate()
+            #if event.type == KEYUP:
+            #    if event.key == K_ESCAPE:
+            #        terminate()
+
+        # Update program state
+
+        # Draw/render
+        # AFTER drawing everything, flip the display
+        pygame.display.flip()
 
 class Options():
     """Define the options in use for this map."""
@@ -76,8 +93,8 @@ class Options():
     def __init__(self):
         self.wraparound = True
         self.coordDisplay = 2
-        self.cellWidth = 40
-        self.cellHeight = 40
+        self.cellWidth = 36
+        self.cellHeight = 36
         self.wraparoundRepeat = 1
         self.wallThickness = 0.05
         self.gridlineThickness = 0.02
@@ -115,19 +132,22 @@ class Map():
         self.opts = opts
         self.numCellsX = opts.numCellsX
         self.numCellsY = opts.numCellsY
-        for x in range(numCellsX):
-            for y in range(numCellsY):
-                self.map[x][y] = MapCell(opts, (x, y))
+        self.map = [None] * self.numCellsX
+        for i in range(self.numCellsX):
+            self.map[i] = [None] * self.numCellsY
+        for x in range(self.numCellsX):
+            for y in range(self.numCellsY):
+                self.map[x][y] = MapCell(self.opts, (x, y))
 
     def draw(self, surface):
-        top = opts.coordDisplay ^ 0 * opts.cellHeight
-        left = opts.coordDisplay ^ 0 * opts.cellWidth
+        top = opts.coordDisplay ** 0 * opts.cellHeight
+        left = opts.coordDisplay ** 0 * opts.cellWidth
         if opts.wraparound == True:
             top += opts.wraparoundRepeat * opts.cellHeight
             left += opts.wraparoundRepeat * opts.cellWidth
-        for x in range(numCellsX):
-            for y in range(numCellsY):
-                map[x][y].draw(surface, left=(left + x * opts.cellWidth), top=(top + y * opts.cellHeight))
+        for x in range(self.numCellsX):
+            for y in range(self.numCellsY):
+                self.map[x][y].draw(surface, left=(left + x * opts.cellWidth), top=(top + y * opts.cellHeight))
 
 if __name__ == "__main__":      # Do not run this if called from some other module, I think???
     main()
