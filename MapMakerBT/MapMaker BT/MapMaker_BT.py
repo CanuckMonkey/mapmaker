@@ -23,6 +23,8 @@ except ImportError as err:
 
 if not pygame.font: print "Warning: fonts disabled."
 
+DEBUGTEST = True
+
 # Define useful colours
 WHITE   = (255, 255, 255)
 BLACK   = (  0,   0,   0)
@@ -45,6 +47,14 @@ LTBROWN = (255, 207,  71)
 NONE = 0
 SINGLE = 1
 BOTH = 2
+
+NORTH = 0
+EAST = 1
+SOUTH = 2
+WEST = 3
+
+WALL = 1
+DOOR = 2
 
 FPS = 24
 
@@ -110,14 +120,37 @@ class Options():
         self.wraparoundRepeat = 1
         self.wallThickness = 0.05
         self.gridlineThickness = 0.02
+        self.wallRectThickness = 0.2
         self.bgcolours = {'default': DKGRAY, 'seen': YELLOW, 'visited': WHITE}
         self.numCellsX = 22
         self.numCellsY = 22
+
+class Wall():
+    """Define a wall bounding a MapCell()."""
+
+    def __init__(self, opts=Options(), direction=NORTH, data=None):
+        self.direction = direction
+        self.data = data
+        self.rect = pygame.Rect(0, 0, 0, 0)
+
+    def draw(self, surface, left=(), top=()):
+        if not left:
+            left = self.rect.left
+        if not top:
+            top = self.rect.top
+        if self.data == DOOR:
+            pass
+        else:
+            pass
+        if DEBUGTEST:
+            myRect = pygame.draw.rect(surface, LTGRAY, self.rect)
+
 
 class MapCell():
     """Define a single cell of the map."""
 
     def __init__(self, opts=Options(), coords=(0, 0), topleft=(0, 0)):
+        self.opts = opts
         self.coords = coords
         self.topleft = topleft
         self.darkness = False
@@ -126,12 +159,29 @@ class MapCell():
         self.odd = False
         self.special = False
         self.encounter = False
-        self.walls = {'n': None, 'e': None, 's': None, 'w': None}
         self.explored = False
-        self.opts = opts
         self.width = opts.cellWidth
         self.height = opts.cellHeight
         self.rect = pygame.Rect(self.topleft, (self.width, self.height))
+        self.walls = {'n': Wall(self.opts, NORTH), 'e': Wall(self.opts, EAST),
+                      's': Wall(self.opts, SOUTH), 'w': Wall(self.opts, WEST)}
+        for wall in self.walls.itervalues():
+            if wall.direction == NORTH:
+                wall.rect.width = self.rect.width
+                wall.rect.height = self.rect.height * self.opts.wallRectThickness
+                wall.rect.midtop = self.rect.midtop
+            elif wall.direction == SOUTH:
+                wall.rect.width = self.rect.width
+                wall.rect.height = self.rect.height * self.opts.wallRectThickness
+                wall.rect.midbottom = self.rect.midbottom
+            elif wall.direction == EAST:
+                wall.rect.width = self.rect.width * self.opts.wallRectThickness
+                wall.rect.height = self.rect.height
+                wall.rect.midleft = self.rect.midleft
+            elif wall.direction == WEST:
+                wall.rect.width = self.rect.width * self.opts.wallRectThickness
+                wall.rect.height = self.rect.height
+                wall.rect.midright = self.rect.midright
 
     def draw(self, surface, left=(), top=()):
         """Draw the MapCell onto the surface."""
@@ -143,7 +193,10 @@ class MapCell():
             bgcolour = self.opts.bgcolours['default']
         else:
             bgcolour = BLACK
+
         myRect = pygame.draw.rect(surface, bgcolour, (left, top, self.width, self.height))
+        for wall in self.walls.itervalues():
+            wall.draw(surface)
 
 class Map():
     """Define one complete map."""
@@ -177,6 +230,8 @@ class Map():
             self.offsetLeft += self.opts.wraparoundRepeat * self.opts.cellWidth
         for x in range(self.numCellsX):
             for y in range(self.numCellsY):
+        #for x in range(2):
+        #    for y in range(2):
                 self.map[x][y].draw(surface)
                 #self.map[x][y].draw(surface, left=(self.offsetLeft + x * self.opts.cellWidth), top=(self.offsetTop + y * self.opts.cellHeight))
 
