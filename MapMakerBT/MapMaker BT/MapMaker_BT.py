@@ -4,12 +4,15 @@
 
 This tool is designed with an initial focus on Bard's Tale-style maps.
 
-Maps are built on a cartesian grid.  Each cell in the grid defines its own contents as well as the contents of the four bounding walls.
+Maps are built on a cartesian grid.  Each cell in the grid defines its
+own contents as well as the contents of the four bounding walls.
 """
 
 # A lot of base code copied from my earlier SoC project.
-# ??? is a searchable string for later lookup for things I know are needed but whose exact use is unclear.
-# "coord" and "coordinates" refer to the MapCell coordinates, while "top" and "left" and "width" etc. refer to pixel coordinates.
+# ??? is a searchable string for later lookup for things I know are
+# needed but whose exact use is unclear.
+# "coord" and "coordinates" refer to the MapCell coordinates, while
+# "top" and "left" and "width" etc. refer to pixel coordinates.
 
 try:
     import os
@@ -21,28 +24,29 @@ except ImportError as err:
     print "Could not load module: %s" % (err)
     sys.exit(2)
 
-if not pygame.font: print "Warning: fonts disabled."
+if not pygame.font:
+    print "Warning: fonts disabled."
 
 DEBUGTEST = True
 
 # Define useful colours
-WHITE   = (255, 255, 255)
-BLACK   = (  0,   0,   0)
-GRAY    = (127, 127, 127)
-LTGRAY  = (191, 191, 191)
-DKGRAY  = ( 63,  63,  63)
-RED     = (255,   0,   0)
-DKRED   = (191,   0,   0)
-BLUE    = (  0,   0, 255)
-DKBLUE  = (  0,   0, 191)
-ORANGE  = (255, 127,   0)
-GREEN   = (  0, 127,   0)
-LTGRN   = ( 63, 191,  63)
-DKGRN   = (  0,  95,   0)
-YELLOW  = (191, 191,   0)
-GOLD    = (127, 127,   0)
-BROWN   = (191,  63,  63)
-LTBROWN = (255, 207,  71)
+WHITE = (255, 255, 255)
+BLACK = (0, 0, 0)
+GRAY = (127, 127, 127)
+LTGRAY = (191, 191, 191)
+DKGRAY = (63, 63, 63)
+RED = (255, 0, 0)
+DKRED = (191, 0, 0)
+BLUE = (0, 0, 255)
+DKBLUE = (0, 0, 191)
+ORANGE = (255, 127, 0)
+GREEN = (0, 127, 0)
+LTGRN = (63, 191, 63)
+DKGRN = (0, 95, 0)
+YELLOW = (191, 191, 0)
+GOLD = (127, 127, 0)
+BROWN = (191, 63, 63)
+LTBROWN = (255, 207, 71)
 
 NONE = 0
 SINGLE = 1
@@ -68,15 +72,17 @@ def main():
     opts = Options()
     theMap = Map(opts)
 
-    screenWidth = opts.cellWidth * (theMap.numCellsX + opts.wraparoundRepeat * 2 + opts.coordDisplay)
-    screenHeight = opts.cellHeight * (theMap.numCellsY + opts.wraparoundRepeat * 2 + opts.coordDisplay)
+    screenWidth = opts.cellWidth * (theMap.numCellsX + opts.wraparoundRepeat
+                                    * 2 + opts.coordDisplay)
+    screenHeight = opts.cellHeight * (theMap.numCellsY + opts.wraparoundRepeat
+                                      * 2 + opts.coordDisplay)
 
     pygame.init()
     screen = pygame.display.set_mode((screenWidth, screenHeight), RESIZABLE, 32)
     pygame.display.set_caption("MapMaker BT by CanuckMonkey Games")
     background = pygame.Surface(screen.get_size())
     background = background.convert()
-    overlay = pygame.Surface(screen.get_size())     # Don't know for sure the purpose of this vs. background???
+    overlay = pygame.Surface(screen.get_size())
     overlay = screen.convert_alpha()
     theMap.draw(background)
     screen.blit(background, (0, 0))
@@ -109,7 +115,7 @@ def main():
         # *After* drawing everything, flip the display
         pygame.display.flip()
 
-class Options():
+class Options(object):
     """Define the options in use for this map."""
 
     def __init__(self):
@@ -125,7 +131,7 @@ class Options():
         self.numCellsX = 22
         self.numCellsY = 22
 
-class Wall():
+class Wall(object):
     """Define a wall bounding a MapCell()."""
 
     def __init__(self, opts=Options(), direction=NORTH, data=None):
@@ -134,6 +140,7 @@ class Wall():
         self.rect = pygame.Rect(0, 0, 0, 0)
 
     def draw(self, surface, left=(), top=()):
+        """Draw the wall to surface."""
         if not left:
             left = self.rect.left
         if not top:
@@ -146,7 +153,7 @@ class Wall():
             myRect = pygame.draw.rect(surface, LTGRAY, self.rect)
 
 
-class MapCell():
+class MapCell(object):
     """Define a single cell of the map."""
 
     def __init__(self, opts=Options(), coords=(0, 0), topleft=(0, 0)):
@@ -198,7 +205,9 @@ class MapCell():
         for wall in self.walls.itervalues():
             wall.draw(surface)
 
-class Map():
+        return myRect
+
+class Map(object):
     """Define one complete map."""
 
     def __init__(self, opts=Options()):
@@ -223,6 +232,7 @@ class Map():
                 self.map[x].append(MapCell(self.opts, coords=(x, y), topleft=(locX, locY)))
 
     def draw(self, surface):
+        """Draw the entire map."""
         offsetTop = self.opts.coordDisplay ** 0 * self.opts.cellHeight
         offsetLeft = self.opts.coordDisplay ** 0 * self.opts.cellWidth
         if self.opts.wraparound == True:
@@ -230,10 +240,11 @@ class Map():
             self.offsetLeft += self.opts.wraparoundRepeat * self.opts.cellWidth
         for x in range(self.numCellsX):
             for y in range(self.numCellsY):
-        #for x in range(2):
-        #    for y in range(2):
                 self.map[x][y].draw(surface)
-                #self.map[x][y].draw(surface, left=(self.offsetLeft + x * self.opts.cellWidth), top=(self.offsetTop + y * self.opts.cellHeight))
+                #self.map[x][y].draw(surface, left=(self.offsetLeft + x *
+                #                                   self.opts.cellWidth),
+                #                    top=(self.offsetTop + y *
+                #                         self.opts.cellHeight))
 
 if __name__ == "__main__":      # Do not run this if called from some other module???
     main()
