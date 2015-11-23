@@ -8,9 +8,15 @@ Maps are built on a cartesian grid.  Each cell in the grid defines its
 own contents as well as the contents of the four bounding walls.
 """
 
+# Yes, I am aware of https://www.python.org/dev/peps/pep-0008/.
+# I *hate* lower_case_with_underscores and *love* mixedCase, which I am
+# using in spite of the PEP 0008 recommendations.
+
 # A lot of base code copied from my earlier SoC project.
+
 # ??? is a searchable string for later lookup for things I know are
 # needed but whose exact use is unclear.
+
 # "coord" and "coordinates" refer to the MapCell coordinates, while
 # "top" and "left" and "width" etc. refer to pixel coordinates.
 
