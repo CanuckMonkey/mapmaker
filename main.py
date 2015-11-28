@@ -23,59 +23,26 @@ own contents as well as the contents of the four bounding walls.
 try:
     import os
     import sys
-    import pygame
-    from pygame.locals import QUIT, KEYUP, K_ESCAPE, RESIZABLE
-    #from pygame.locals import *     # Bad form, should import only needed items for clarity
+    import pygame as pg
+
+    import options
+    from prepare import COLORS, COORD_DISPLAY, DIRS, WALL_TYPE
 except ImportError as err:
     print "Could not load module: %s" % (err)
     sys.exit(2)
 
-if not pygame.font:
+if not pg.font:
     print "Warning: fonts disabled."
 
-DEBUGTEST = True
-
-# Define useful colours
-WHITE = (255, 255, 255)
-BLACK = (0, 0, 0)
-GRAY = (127, 127, 127)
-LTGRAY = (191, 191, 191)
-DKGRAY = (63, 63, 63)
-RED = (255, 0, 0)
-DKRED = (191, 0, 0)
-BLUE = (0, 0, 255)
-DKBLUE = (0, 0, 191)
-ORANGE = (255, 127, 0)
-GREEN = (0, 127, 0)
-LTGRN = (63, 191, 63)
-DKGRN = (0, 95, 0)
-YELLOW = (191, 191, 0)
-GOLD = (127, 127, 0)
-BROWN = (191, 63, 63)
-LTBROWN = (255, 207, 71)
-
-NONE = 0
-SINGLE = 1
-BOTH = 2
-
-NORTH = 0
-EAST = 1
-SOUTH = 2
-WEST = 3
-
-WALL = 1
-DOOR = 2
-
-FPS = 24
 
 def terminate():
     """End the program cleanly."""
-    pygame.quit()
+    pg.quit()
     sys.exit(0)
 
 def main():
     """Run the program."""
-    opts = Options()
+    opts = options.Options()
     theMap = Map(opts)
 
     screenWidth = opts.cellWidth * (theMap.numCellsX + opts.wraparoundRepeat
@@ -83,18 +50,18 @@ def main():
     screenHeight = opts.cellHeight * (theMap.numCellsY + opts.wraparoundRepeat
                                       * 2 + opts.coordDisplay)
 
-    pygame.init()
-    screen = pygame.display.set_mode((screenWidth, screenHeight), RESIZABLE, 32)
-    pygame.display.set_caption("MapMaker BT by CanuckMonkey Games")
-    background = pygame.Surface(screen.get_size())
+    pg.init()
+    screen = pg.display.set_mode((screenWidth, screenHeight), pg.RESIZABLE, 32)
+    pg.display.set_caption("MapMaker BT by CanuckMonkey Games")
+    background = pg.Surface(screen.get_size())
     background = background.convert()
-    overlay = pygame.Surface(screen.get_size())
+    overlay = pg.Surface(screen.get_size())
     overlay = screen.convert_alpha()
     theMap.draw(background)
     screen.blit(background, (0, 0))
-    pygame.display.flip()
+    pg.display.flip()
 
-    clock = pygame.time.Clock()
+    clock = pg.time.Clock()
 
     running = True
 
@@ -104,11 +71,11 @@ def main():
         clock.tick(FPS)
 
         # Process input
-        for event in pygame.event.get():
-            if event.type == QUIT:      #
+        for event in pg.event.get():
+            if event.type == pg.QUIT:      #
                 terminate()
-            #if event.type == KEYUP:
-            #    if event.key == K_ESCAPE:
+            #if event.type == pg.KEYUP:
+            #    if event.key == pg.K_ESCAPE:
             #        terminate()
 
         # Update program state
@@ -119,31 +86,15 @@ def main():
         screen.blit(overlay, (0, 0))
 
         # *After* drawing everything, flip the display
-        pygame.display.flip()
-
-class Options(object):
-    """Define the options in use for this map."""
-
-    def __init__(self):
-        self.wraparound = True
-        self.coordDisplay = BOTH
-        self.cellWidth = 32
-        self.cellHeight = 32
-        self.wraparoundRepeat = 1
-        self.wallThickness = 0.05
-        self.gridlineThickness = 0.02
-        self.wallRectThickness = 0.2
-        self.bgcolours = {'default': DKGRAY, 'seen': YELLOW, 'visited': WHITE}
-        self.numCellsX = 22
-        self.numCellsY = 22
+        pg.display.flip()
 
 class Wall(object):
     """Define a wall bounding a MapCell()."""
 
-    def __init__(self, opts=Options(), direction=NORTH, data=None):
+    def __init__(self, opts, direction, data=None):
         self.direction = direction
         self.data = data
-        self.rect = pygame.Rect(0, 0, 0, 0)
+        self.rect = pg.Rect(0, 0, 0, 0)
 
     def draw(self, surface, left=(), top=()):
         """Draw the wall to surface."""
@@ -151,18 +102,18 @@ class Wall(object):
             left = self.rect.left
         if not top:
             top = self.rect.top
-        if self.data == DOOR:
+        if self.data == WALL_TYPE['door']:
             pass
         else:
             pass
         if DEBUGTEST:
-            myRect = pygame.draw.rect(surface, LTGRAY, self.rect)
+            myRect = pg.draw.rect(surface, COLORS['ltgray'], self.rect)
 
 
 class MapCell(object):
     """Define a single cell of the map."""
 
-    def __init__(self, opts=Options(), coords=(0, 0), topleft=(0, 0)):
+    def __init__(self, opts, coords=(0, 0), topleft=(0, 0)):
         self.opts = opts
         self.coords = coords
         self.topleft = topleft
@@ -175,23 +126,23 @@ class MapCell(object):
         self.explored = False
         self.width = opts.cellWidth
         self.height = opts.cellHeight
-        self.rect = pygame.Rect(self.topleft, (self.width, self.height))
-        self.walls = {'n': Wall(self.opts, NORTH), 'e': Wall(self.opts, EAST),
-                      's': Wall(self.opts, SOUTH), 'w': Wall(self.opts, WEST)}
+        self.rect = pg.Rect(self.topleft, (self.width, self.height))
+        self.walls = {'n': Wall(self.opts, DIRS['north']), 'e': Wall(self.opts, DIRS['east']),
+                      's': Wall(self.opts, DIRS['south']), 'w': Wall(self.opts, DIRS['west'])}
         for wall in self.walls.itervalues():
-            if wall.direction == NORTH:
+            if wall.direction == DIRS['north']:
                 wall.rect.width = self.rect.width
                 wall.rect.height = self.rect.height * self.opts.wallRectThickness
                 wall.rect.midtop = self.rect.midtop
-            elif wall.direction == SOUTH:
+            elif wall.direction == DIRS['south']:
                 wall.rect.width = self.rect.width
                 wall.rect.height = self.rect.height * self.opts.wallRectThickness
                 wall.rect.midbottom = self.rect.midbottom
-            elif wall.direction == EAST:
+            elif wall.direction == DIRS['east']:
                 wall.rect.width = self.rect.width * self.opts.wallRectThickness
                 wall.rect.height = self.rect.height
                 wall.rect.midleft = self.rect.midleft
-            elif wall.direction == WEST:
+            elif wall.direction == DIRS['west']:
                 wall.rect.width = self.rect.width * self.opts.wallRectThickness
                 wall.rect.height = self.rect.height
                 wall.rect.midright = self.rect.midright
@@ -205,9 +156,9 @@ class MapCell(object):
         if self.explored == False:
             bgcolour = self.opts.bgcolours['default']
         else:
-            bgcolour = BLACK
+            bgcolour = COLORS['black']
 
-        myRect = pygame.draw.rect(surface, bgcolour, (left, top, self.width, self.height))
+        myRect = pg.draw.rect(surface, bgcolour, (left, top, self.width, self.height))
         for wall in self.walls.itervalues():
             wall.draw(surface)
 
@@ -216,7 +167,7 @@ class MapCell(object):
 class Map(object):
     """Define one complete map."""
 
-    def __init__(self, opts=Options()):
+    def __init__(self, opts):
         self.opts = opts
         self.numCellsX = opts.numCellsX
         self.numCellsY = opts.numCellsY
