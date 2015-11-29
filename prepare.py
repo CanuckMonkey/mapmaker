@@ -1,6 +1,6 @@
-import os
+﻿import os
 
-DEBUG_TEST = True
+DEBUG_TEST = False
 
 COLORS = {
     'white':(255, 255, 255),

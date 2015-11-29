@@ -1,4 +1,4 @@
-import pygame as pg
+﻿import pygame as pg
 
 import options
 from prepare import COLORS, COORD_DISPLAY, DIRS, WALL_TYPE, DEBUG_TEST, FPS
@@ -72,12 +72,13 @@ class MapCell(object):
             left = self.rect.left
         if not top:
             top = self.rect.top
-        if self.explored == False:
+        if not self.explored:
             bgcolour = self.opts.bgcolours['default']
         else:
             bgcolour = COLORS['black']
 
         myRect = pg.draw.rect(surface, bgcolour, (left, top, self.width, self.height))
+        pg.draw.rect(surface, COLORS['ltgrey'], myRect, 1)
         for wall in self.walls.itervalues():
             wall.draw(surface)
 
@@ -112,7 +113,7 @@ class Map(object):
         """Draw the entire map."""
         offsetTop = self.opts.coordDisplay ** 0 * self.opts.cellHeight
         offsetLeft = self.opts.coordDisplay ** 0 * self.opts.cellWidth
-        if self.opts.wraparound == True:
+        if self.opts.wraparound:
             self.offsetTop += self.opts.wraparoundRepeat * self.opts.cellHeight
             self.offsetLeft += self.opts.wraparoundRepeat * self.opts.cellWidth
         for x in range(self.numCellsX):

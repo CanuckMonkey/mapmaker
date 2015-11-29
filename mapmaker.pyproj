@@ -38,6 +38,8 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="asset\image\icon.png" />
+    <Content Include="LICENSE.md" />
+    <Content Include="README.md" />
   </ItemGroup>
   <Import Project="$(PtvsTargetsFile)" Condition="Exists($(PtvsTargetsFile))" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets" Condition="!Exists($(PtvsTargetsFile))" />
