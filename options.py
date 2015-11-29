@@ -12,7 +12,10 @@ class Options(object):
         self.wallThickness = 0.05
         self.gridlineThickness = 0.02
         self.wallRectThickness = 0.2
-        self.bgcolours = {'default': DKGRAY, 'seen': YELLOW, 'visited': WHITE}
+        self.bgcolours = {'default': COLORS['dkgrey'],
+                          'seen': COLORS['yellow'],
+                          'visited': COLORS['white']
+                          }
         self.numCellsX = 22
         self.numCellsY = 22
 

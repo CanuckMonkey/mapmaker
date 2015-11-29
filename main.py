@@ -26,7 +26,8 @@ try:
     import pygame as pg
 
     import options
-    from prepare import COLORS, COORD_DISPLAY, DIRS, WALL_TYPE
+    from prepare import COLORS, COORD_DISPLAY, DIRS, WALL_TYPE, DEBUG_TEST, FPS
+
 except ImportError as err:
     print "Could not load module: %s" % (err)
     sys.exit(2)
@@ -106,14 +107,14 @@ class Wall(object):
             pass
         else:
             pass
-        if DEBUGTEST:
-            myRect = pg.draw.rect(surface, COLORS['ltgray'], self.rect)
+        if DEBUG_TEST:
+            myRect = pg.draw.rect(surface, COLORS['ltgrey'], self.rect)
 
 
 class MapCell(object):
     """Define a single cell of the map."""
 
-    def __init__(self, opts, coords=(0, 0), topleft=(0, 0)):
+    def __init__(self, opts, coords, topleft):
         self.opts = opts
         self.coords = coords
         self.topleft = topleft
@@ -127,8 +128,11 @@ class MapCell(object):
         self.width = opts.cellWidth
         self.height = opts.cellHeight
         self.rect = pg.Rect(self.topleft, (self.width, self.height))
-        self.walls = {'n': Wall(self.opts, DIRS['north']), 'e': Wall(self.opts, DIRS['east']),
-                      's': Wall(self.opts, DIRS['south']), 'w': Wall(self.opts, DIRS['west'])}
+        self.walls = {'n': Wall(self.opts, DIRS['north']),
+                      'e': Wall(self.opts, DIRS['east']),
+                      's': Wall(self.opts, DIRS['south']),
+                      'w': Wall(self.opts, DIRS['west'])
+                      }
         for wall in self.walls.itervalues():
             if wall.direction == DIRS['north']:
                 wall.rect.width = self.rect.width
