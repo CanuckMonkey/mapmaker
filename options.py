@@ -1,4 +1,5 @@
-from prepare import *
+﻿from prepare import *
+
 
 class Options(object):
     """Define the options in use for this map."""
