@@ -43,6 +43,7 @@ def terminate():
     pg.quit()
     sys.exit(0)
 
+
 def main():
     """Run the program."""
     opts = options.Options()
