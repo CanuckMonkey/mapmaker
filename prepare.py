@@ -1,6 +1,16 @@
 ﻿import os
 
+import pygame as pg
+
+import tools
+
 DEBUG_TEST = False
+
+GFX = tools.load_all_gfx(os.path.join("asset", "image"))
+SFX = tools.load_all_sfx(os.path.join("asset", "sound"))
+FONTS = tools.load_all_fonts(os.path.join("asset", "font"))
+MUSIC = tools.load_all_music(os.path.join("asset", "music"))
+
 
 COLORS = {
     'white':(255, 255, 255),
@@ -43,33 +53,4 @@ WALL_TYPE = {
     }
 
 FPS = 24
-
-
-# Define useful colours
-#WHITE = (255, 255, 255)
-#BLACK = (0, 0, 0)
-#GRAY = (127, 127, 127)
-#LTGRAY = (191, 191, 191)
-#DKGRAY = (63, 63, 63)
-#RED = (255, 0, 0)
-#DKRED = (191, 0, 0)
-#BLUE = (0, 0, 255)
-#DKBLUE = (0, 0, 191)
-#ORANGE = (255, 127, 0)
-#GREEN = (0, 127, 0)
-#LTGRN = (63, 191, 63)
-#DKGRN = (0, 95, 0)
-#YELLOW = (191, 191, 0)
-#GOLD = (127, 127, 0)
-#BROWN = (191, 63, 63)
-#LTBROWN = (255, 207, 71)
-
-#NONE = 0
-#SINGLE = 1
-#BOTH = 2
-
-#NORTH = 0
-#EAST = 1
-#SOUTH = 2
-#WEST = 3
 

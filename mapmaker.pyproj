@@ -31,6 +31,7 @@
     <Compile Include="prepare.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="tools.py" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="asset\" />
@@ -38,6 +39,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="asset\image\icon.png" />
+    <Content Include="ATTRIBUTION.md" />
     <Content Include="LICENSE.md" />
     <Content Include="README.md" />
   </ItemGroup>
