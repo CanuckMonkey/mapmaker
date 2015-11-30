@@ -26,9 +26,10 @@ try:
 
     import pygame as pg
 
-    import options
+    import prepare
     import map
-    from prepare import COLORS, COORD_DISPLAY, DIRS, WALL_TYPE, DEBUG_TEST, FPS
+    import options
+    from options import COLORS, COORD_DISPLAY, DIRS, WALL_TYPE, DEBUG_TEST, FPS
 
 except ImportError as err:
     print "Could not load module: %s" % (err)
@@ -46,24 +47,6 @@ def terminate():
 
 def main():
     """Run the program."""
-    opts = options.Options()
-    theMap = map.Map(opts)
-
-    screenWidth = opts.cellWidth * (theMap.numCellsX + opts.wraparoundRepeat
-                                    * 2 + opts.coordDisplay)
-    screenHeight = opts.cellHeight * (theMap.numCellsY + opts.wraparoundRepeat
-                                      * 2 + opts.coordDisplay)
-
-    pg.init()
-    screen = pg.display.set_mode((screenWidth, screenHeight), pg.RESIZABLE, 32)
-    pg.display.set_caption("MapMaker BT by CanuckMonkey Games")
-    background = pg.Surface(screen.get_size())
-    background = background.convert()
-    overlay = pg.Surface(screen.get_size())
-    overlay = screen.convert_alpha()
-    theMap.draw(background)
-    screen.blit(background, (0, 0))
-    pg.display.flip()
 
     clock = pg.time.Clock()
 
@@ -85,9 +68,9 @@ def main():
         # Update program state
 
         # Draw/render
-        overlay.fill((0, 0, 0, 0))
-        theMap.draw(overlay)
-        screen.blit(overlay, (0, 0))
+        prepare.overlay.fill((0, 0, 0, 0))
+        prepare.theMap.draw(prepare.overlay)
+        prepare.screen.blit(prepare.overlay, (0, 0))
 
         # *After* drawing everything, flip the display
         pg.display.flip()

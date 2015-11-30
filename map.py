@@ -1,7 +1,7 @@
 ﻿import pygame as pg
 
-import options
-from prepare import COLORS, COORD_DISPLAY, DIRS, WALL_TYPE, DEBUG_TEST, FPS
+import prepare
+from options import COLORS, COORD_DISPLAY, DIRS, WALL_TYPE, DEBUG_TEST, FPS
 
 
 class Wall(object):

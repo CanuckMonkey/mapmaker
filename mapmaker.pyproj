@@ -36,6 +36,9 @@
   <ItemGroup>
     <Folder Include="asset\" />
     <Folder Include="asset\image\" />
+    <Folder Include="asset\font\" />
+    <Folder Include="asset\music\" />
+    <Folder Include="asset\sound\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="asset\image\icon.png" />
