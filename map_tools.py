@@ -6,7 +6,6 @@ Map(): ???
 
 import pygame as pg
 
-import prepare
 from options import COLORS, COORD_DISPLAY, DIRS, WALL_TYPE, DEBUG_TEST, FPS
 
 
