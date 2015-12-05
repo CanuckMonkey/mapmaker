@@ -4,19 +4,19 @@ import pygame as pg
 
 import tools
 import options
-import map
+import map_tools
 
 
 opts = options.Options()
-theMap = map.Map(opts)
+the_map = map_tools.Map(opts)
 
-screenWidth = opts.cellWidth * (theMap.numCellsX + opts.wraparoundRepeat
-                                * 2 + opts.coordDisplay)
-screenHeight = opts.cellHeight * (theMap.numCellsY + opts.wraparoundRepeat
-                                    * 2 + opts.coordDisplay)
+screen_width = opts.cell_width * (the_map.num_cells_x + opts.wraparound_repeat *
+                                 2 + opts.coord_display)
+screen_height = opts.cell_height * (the_map.num_cells_y + opts.wraparound_repeat *
+                                   2 + opts.coord_display)
 
 pg.init()
-screen = pg.display.set_mode((screenWidth, screenHeight), pg.RESIZABLE, 32)
+screen = pg.display.set_mode((screen_width, screen_height), pg.RESIZABLE, 32)
 pg.display.set_caption("MapMaker BT by CanuckMonkey Games")
 
 
@@ -29,7 +29,7 @@ background = pg.Surface(screen.get_size())
 background = background.convert()
 overlay = pg.Surface(screen.get_size())
 overlay = screen.convert_alpha()
-theMap.draw(background)
+the_map.draw(background)
 screen.blit(background, (0, 0))
 pg.display.flip()
 

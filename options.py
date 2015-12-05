@@ -50,18 +50,18 @@ class Options(object):
 
     def __init__(self):
         self.wraparound = True
-        self.coordDisplay = COORD_DISPLAY['both']
-        self.cellWidth = 32
-        self.cellHeight = 32
-        self.wraparoundRepeat = 1
-        self.wallThickness = 0.05
-        self.gridlineThickness = 0.02
-        self.wallRectThickness = 0.2
+        self.coord_display = COORD_DISPLAY['both']
+        self.cell_width = 32
+        self.cell_height = 32
+        self.wraparound_repeat = 1
+        self.wall_thickness = 0.05
+        self.gridline_thickness = 0.02
+        self.wall_rect_thickness = 0.2
         self.bgcolours = {'default': COLORS['dkgrey'],
                           'seen': COLORS['yellow'],
-                          'visited': COLORS['white']
+                          'visited': COLORS['white'],
                           }
-        self.numCellsX = 22
-        self.numCellsY = 22
+        self.num_cells_x = 22
+        self.num_cells_y = 22
 
 

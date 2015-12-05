@@ -10,7 +10,8 @@ own contents as well as the contents of the four bounding walls.
 
 # Yes, I am aware of https://www.python.org/dev/peps/pep-0008/.
 # I *hate* lower_case_with_underscores and *love* mixedCase, which I am
-# using in spite of the PEP 0008 recommendations.
+# using in spite of the PEP 0008 recommendations.  That said, I am
+# gradually (and grudgingly) switching over.
 
 # A lot of base code copied from my earlier SoC project.
 
@@ -27,7 +28,7 @@ try:
     import pygame as pg
 
     import prepare
-    import map
+    import map_tools
     import options
     from options import COLORS, COORD_DISPLAY, DIRS, WALL_TYPE, DEBUG_TEST, FPS
 
@@ -69,7 +70,7 @@ def main():
 
         # Draw/render
         prepare.overlay.fill((0, 0, 0, 0))
-        prepare.theMap.draw(prepare.overlay)
+        prepare.the_map.draw(prepare.overlay)
         prepare.screen.blit(prepare.overlay, (0, 0))
 
         # *After* drawing everything, flip the display
