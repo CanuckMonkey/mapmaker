@@ -8,11 +8,6 @@ Maps are built on a cartesian grid.  Each cell in the grid defines its
 own contents as well as the contents of the four bounding walls.
 """
 
-# Yes, I am aware of https://www.python.org/dev/peps/pep-0008/.
-# I *hate* lower_case_with_underscores and *love* mixedCase, which I am
-# using in spite of the PEP 0008 recommendations.  That said, I am
-# gradually (and grudgingly) switching over.
-
 # A lot of base code copied from my earlier SoC project.
 
 # ??? is a searchable string for later lookup for things I know are
@@ -21,10 +16,10 @@ own contents as well as the contents of the four bounding walls.
 # "coord" and "coordinates" refer to the MapCell coordinates, while
 # "top" and "left" and "width" etc. refer to pixel coordinates.
 
-try:
-    import os
-    import sys
+import os
+import sys
 
+try:
     import pygame as pg
 
     import prepare
@@ -40,10 +35,10 @@ if not pg.font:
     print "Warning: fonts disabled."
 
 
-def terminate():
-    """End the program cleanly."""
-    pg.quit()
-    sys.exit(0)
+#def terminate():
+#    """End the program cleanly."""
+#    pg.quit()
+#    sys.exit(0)
 
 
 def main():
@@ -60,11 +55,11 @@ def main():
 
         # Process input
         for event in pg.event.get():
-            if event.type == pg.QUIT:      #
-                terminate()
-            #if event.type == pg.KEYUP:
-            #    if event.key == pg.K_ESCAPE:
-            #        terminate()
+            if event.type == pg.QUIT:
+                running = False
+            if event.type == pg.KEYUP:
+                if event.key == pg.K_ESCAPE:
+                    running = False
 
         # Update program state
 
@@ -76,6 +71,12 @@ def main():
         # *After* drawing everything, flip the display
         pg.display.flip()
 
+    pg.quit()
+    return 0
 
-if __name__ == "__main__":      # Do not run this if called from some other module???
-    main()
+
+#if __name__ == "__main__":      # Do not run this if called from some other module???
+#    main()
+
+if __name__ == "__main__":
+    sys.exit(int(main() or 0))
