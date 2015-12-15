@@ -33,7 +33,3 @@ the_map.draw(background)
 screen.blit(background, (0, 0))
 pg.display.flip()
 
-
-
-
-
