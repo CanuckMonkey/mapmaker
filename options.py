@@ -1,7 +1,9 @@
 ﻿import pygame as pg
 #from prepare import *
 
-DEBUG_TEST = False
+TEST_FLAGS = {'debug': False,
+              'doors': False
+              }
 
 COLORS = {
     'white':(255, 255, 255),
@@ -17,7 +19,7 @@ COLORS = {
     'green':(0, 127, 0),
     'ltgrn':(63, 191, 63),
     'dkgrn':(0, 95, 0),
-    'yellow':(191, 191, 0),
+    'yellow':(255, 255, 0),
     'gold':(127, 127, 0),
     'brown':(191, 63, 63),
     'ltbrown':(255, 207, 71)

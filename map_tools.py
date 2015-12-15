@@ -4,9 +4,13 @@ Map(): ???
 
 """
 
+import math
+
 import pygame as pg
 
-from options import COLORS, COORD_DISPLAY, DIRS, WALL_TYPE, DEBUG_TEST, FPS
+from options import COLORS, COORD_DISPLAY, DIRS, WALL_TYPE, TEST_FLAGS, FPS
+
+DATA_DUMP = False
 
 
 class Wall(object):
@@ -16,6 +20,7 @@ class Wall(object):
         self.direction = direction
         self.data = data
         self.rect = pg.Rect(0, 0, 0, 0)
+        self.opts = opts
 
     def draw(self, surface, left=(), top=()):
         """Draw the wall to surface."""
@@ -23,11 +28,36 @@ class Wall(object):
             left = self.rect.left
         if not top:
             top = self.rect.top
+
+        temp_surf = pg.Surface((self.opts.cell_width,
+                                self.opts.cell_height *
+                                self.opts.wall_rect_thickness), 0, surface)
+        temp_surf.fill((255, 255, 255, 0))
+
         if self.data == WALL_TYPE['door']:
-            pass
+            door_points = [(0, 0),
+                           (math.ceil(self.opts.cell_width * 0.25), 0),
+                           (math.ceil(self.opts.cell_width * 0.25),
+                            self.opts.wall_rect_thickness * self.opts.cell_height * 0.7),
+                           (math.floor(self.opts.cell_width * 0.75) - 1,
+                            self.opts.wall_rect_thickness * self.opts.cell_height * 0.7),
+                           (math.floor(self.opts.cell_width * 0.75) - 1, 0),
+                           (self.opts.cell_width, 0)]
+            pg.draw.lines(temp_surf, COLORS['black'], False, door_points,
+                          max(1, int(self.opts.cell_height *
+                                     self.opts.wall_thickness)))
         else:
-            pass
-        if DEBUG_TEST:
+            pg.draw.line(temp_surf, COLORS['ltgrey'], (0, 0), (self.opts.cell_width, 0),
+                         max(1, self.opts.gridline_thickness * self.opts.cell_height))
+
+        temp_surf = pg.transform.rotate(temp_surf, 90 * self.direction)
+        if not (self.opts.cell_height == self.opts.cell_width):
+            pass # TODO add code to scale size of image
+        my_rect = surface.blit(temp_surf, (left, top))
+        #my_rect = surface.blit(temp_surf, self.rect)
+
+
+        if TEST_FLAGS['debug']:
             my_rect = pg.draw.rect(surface, COLORS['ltgrey'], self.rect)
 
 
@@ -44,7 +74,7 @@ class MapCell(object):
         self.odd = False
         self.special = False
         self.encounter = False
-        self.explored = False
+        self.explored = 'default'
         self.width = opts.cell_width
         self.height = opts.cell_height
         self.rect = pg.Rect(self.topleft, (self.width, self.height))
@@ -71,21 +101,30 @@ class MapCell(object):
                 wall.rect.height = self.rect.height
                 wall.rect.midright = self.rect.midright
 
-    def draw(self, surface, left=(), top=()):
+        if TEST_FLAGS['doors'] and self.coords == (1, 1):
+            self.explored = 'seen'
+            #for wall in self.walls.itervalues():
+            #    wall.data = WALL_TYPE['door']
+            self.walls['n'].data = WALL_TYPE['door']
+
+
+    def draw(self, surface, left=0, top=0):
         """Draw the MapCell onto the surface."""
         if not left:
             left = self.rect.left
         if not top:
             top = self.rect.top
-        if not self.explored:
-            bgcolour = self.opts.bgcolours['default']
-        else:
-            bgcolour = COLORS['black']
+        #if not self.explored:
+        #    bgcolour = self.opts.bgcolours['default']
+        #else:
+        #    bgcolour = self.opts.bgcolours[self.explored]
+        bgcolour = self.opts.bgcolours[self.explored]
 
         my_rect = pg.draw.rect(surface, bgcolour, (left, top, self.width, self.height))
-        pg.draw.rect(surface, COLORS['ltgrey'], my_rect, 1)
+        #pg.draw.rect(surface, COLORS['ltgrey'], my_rect,
+        #             max(1, self.opts.gridline_thickness * self.opts.cell_height))
         for wall in self.walls.itervalues():
-            wall.draw(surface)
+            wall.draw(surface) #, left=wall.rect.left, top=wall.rect.top)
 
         return my_rect
 
@@ -128,3 +167,7 @@ class Map(object):
                 #                                   self.opts.cellWidth),
                 #                    top=(self.offsetTop + y *
                 #                         self.opts.cellHeight))
+                if x == 0 and y == 0:
+                    DATA_DUMP = True
+                else:
+                    DATA_DUMP = False

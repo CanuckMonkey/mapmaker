@@ -25,7 +25,7 @@ try:
     import prepare
     import map_tools
     import options
-    from options import COLORS, COORD_DISPLAY, DIRS, WALL_TYPE, DEBUG_TEST, FPS
+    from options import COLORS, COORD_DISPLAY, DIRS, WALL_TYPE, FPS
 
 except ImportError as err:
     print "Could not load module: %s" % (err)
