@@ -16,7 +16,7 @@ DATA_DUMP = False
 class Wall(object):
     """Define a wall bounding a MapCell()."""
 
-    def __init__(self, opts, direction, data=None):
+    def __init__(self, opts, direction, data=WALL_TYPE['none']):
         self.direction = direction
         self.data = data
         self.rect = pg.Rect(0, 0, 0, 0)
@@ -55,7 +55,7 @@ class Wall(object):
             pass # TODO add code to scale size of image
         my_rect = surface.blit(temp_surf, (left, top))
         #my_rect = surface.blit(temp_surf, self.rect)
-
+        self.appearance = temp_surf
 
         if TEST_FLAGS['debug']:
             my_rect = pg.draw.rect(surface, COLORS['ltgrey'], self.rect)
