@@ -68,8 +68,14 @@ def main():
         prepare.the_map.draw(prepare.overlay)
         prepare.screen.blit(prepare.overlay, (0, 0))
 
-        # *After* drawing everything, flip the display
-        pg.display.flip()
+        ## *After* drawing everything, flip the display
+        #pg.display.flip()
+
+        # *After* drawing everything, update the display
+        pg.display.update()
+
+        pg.display.set_caption(prepare.ORIGINAL_CAPTION+
+                               "     FPS: {}".format(clock.get_fps()))
 
     pg.quit()
     return 0

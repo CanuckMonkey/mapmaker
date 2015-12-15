@@ -6,6 +6,7 @@ import tools
 import options
 import map_tools
 
+ORIGINAL_CAPTION = "MapMaker BT by CanuckMonkey Games"
 
 opts = options.Options()
 the_map = map_tools.Map(opts)
@@ -17,7 +18,7 @@ screen_height = opts.cell_height * (the_map.num_cells_y + opts.wraparound_repeat
 
 pg.init()
 screen = pg.display.set_mode((screen_width, screen_height), pg.RESIZABLE, 32)
-pg.display.set_caption("MapMaker BT by CanuckMonkey Games")
+pg.display.set_caption(ORIGINAL_CAPTION)
 
 
 GFX = tools.load_all_gfx(os.path.join("asset", "image"))
