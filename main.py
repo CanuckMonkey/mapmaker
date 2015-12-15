@@ -64,15 +64,13 @@ def main():
         # Update program state
 
         # Draw/render
+        dirty_rects = []
         prepare.overlay.fill((0, 0, 0, 0))
-        prepare.the_map.draw(prepare.overlay)
+        dirty_rects.extend(prepare.the_map.draw(prepare.overlay))
         prepare.screen.blit(prepare.overlay, (0, 0))
 
-        ## *After* drawing everything, flip the display
-        #pg.display.flip()
-
         # *After* drawing everything, update the display
-        pg.display.update()
+        pg.display.update(dirty_rects)
 
         pg.display.set_caption(prepare.ORIGINAL_CAPTION+
                                "     FPS: {}".format(clock.get_fps()))
