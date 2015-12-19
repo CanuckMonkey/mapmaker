@@ -13,15 +13,15 @@ from options import COLORS, COORD_DISPLAY, DIRS, WALL_TYPE, TEST_FLAGS, FPS
 DATA_DUMP = False
 
 
-class Wall(object):
+class Wall(pg.sprite.DirtySprite):
     """Define a wall bounding a MapCell()."""
 
-    def __init__(self, opts, direction, data=WALL_TYPE['none']):
+    def __init__(self, opts, direction, data=WALL_TYPE['none'], *groups):
+        super(Wall, self).__init__(*groups)
         self.direction = direction
         self.data = data
         self.rect = pg.Rect(0, 0, 0, 0)
         self.opts = opts
-        self.dirty = True
 
     def draw(self, surface, left=(), top=()):
         """Draw the wall to surface."""
@@ -68,10 +68,11 @@ class Wall(object):
             my_rect = pg.draw.rect(surface, COLORS['ltgrey'], self.rect)
 
 
-class MapCell(object):
+class MapCell(pg.sprite.DirtySprite):
     """Define a single cell of the map."""
 
-    def __init__(self, opts, coords, topleft):
+    def __init__(self, opts, coords, topleft, *groups):
+        super(MapCell, self).__init__(*groups)
         self.opts = opts
         self.coords = coords
         self.topleft = topleft
@@ -85,10 +86,10 @@ class MapCell(object):
         self.width = opts.cell_width
         self.height = opts.cell_height
         self.rect = pg.Rect(self.topleft, (self.width, self.height))
-        self.walls = {'n': Wall(self.opts, DIRS['north']),
-                      'e': Wall(self.opts, DIRS['east']),
-                      's': Wall(self.opts, DIRS['south']),
-                      'w': Wall(self.opts, DIRS['west']),
+        self.walls = {'n': Wall(self.opts, DIRS['north'], *groups),
+                      'e': Wall(self.opts, DIRS['east'], *groups),
+                      's': Wall(self.opts, DIRS['south'], *groups),
+                      'w': Wall(self.opts, DIRS['west'], *groups),
                       }
         self.dirty = True
         for wall in self.walls.itervalues():
@@ -143,10 +144,11 @@ class MapCell(object):
         return dirty_rects
 
 
-class Map(object):
+class Map(pg.sprite.LayeredDirty):
     """Define one complete map."""
 
-    def __init__(self, opts):
+    def __init__(self, opts, *groups, **kwargs):
+        super(Map, self).__init__(*groups, **kwargs)
         self.opts = opts
         self.num_cells_x = opts.num_cells_x
         self.num_cells_y = opts.num_cells_y
@@ -166,6 +168,7 @@ class Map(object):
                 loc_x = self.offset_left + x * opts.cell_width
                 loc_y = self.offset_top + y * opts.cell_height
                 self.map[x].append(MapCell(self.opts, coords=(x, y), topleft=(loc_x, loc_y)))
+                self.add(self.map[x][y])
 
     def draw(self, surface):
         """Draw the entire map."""

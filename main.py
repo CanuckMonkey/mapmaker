@@ -65,8 +65,11 @@ def main():
 
         # Draw/render
         dirty_rects = []
+        #dirty_rects = pg.sprite.LayeredDirty()
         prepare.overlay.fill((0, 0, 0, 0))
+        #prepare.the_map.draw(prepare.screen)
         dirty_rects.extend(prepare.the_map.draw(prepare.overlay))
+        #dirty_rects.add(prepare.the_map.draw(prepare.overlay))
         prepare.screen.blit(prepare.overlay, (0, 0))
 
         # *After* drawing everything, update the display
