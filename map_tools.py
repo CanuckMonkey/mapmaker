@@ -23,6 +23,12 @@ class Wall(object):
         self.opts = opts
         self.dirty = True
 
+    def hover(self, surface):
+        highlight = pg.Surface((self.rect.w, self.rect.h))
+        highlight.fill((255, 255, 255, 127))
+        rect = surface.blit(highlight, self.rect)
+        return rect
+    
     def draw(self, surface, left=(), top=()):
         """Draw the wall to surface."""
         if not left:
