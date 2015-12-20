@@ -42,7 +42,7 @@ class Wall(pg.sprite.DirtySprite):
         temp_surf = pg.Surface((self.opts.cell_width,
                                 self.opts.cell_height *
                                 self.opts.wall_rect_thickness), 0, surface)
-        temp_surf.fill((255, 255, 255, 0))
+        temp_surf.fill((0, 0, 0, 0))
 
         if self.data == WALL_TYPE['door']:
             door_points = [(0, 0),
@@ -95,13 +95,18 @@ class MapCell(pg.sprite.DirtySprite):
         self.width = opts.cell_width
         self.height = opts.cell_height
         self.rect = pg.Rect(self.topleft, (self.width, self.height))
-        self.walls = {'n': Wall(self.opts, DIRS['north'], *groups),
-                      'e': Wall(self.opts, DIRS['east'], *groups),
-                      's': Wall(self.opts, DIRS['south'], *groups),
-                      'w': Wall(self.opts, DIRS['west'], *groups),
-                      }
+        self.walls = [Wall(self.opts, DIRS['north'], *groups),
+                      Wall(self.opts, DIRS['east'], *groups),
+                      Wall(self.opts, DIRS['south'], *groups),
+                      Wall(self.opts, DIRS['west'], *groups),
+                      ]
+        #self.walls = {'n': Wall(self.opts, DIRS['north'], *groups),
+        #              'e': Wall(self.opts, DIRS['east'], *groups),
+        #              's': Wall(self.opts, DIRS['south'], *groups),
+        #              'w': Wall(self.opts, DIRS['west'], *groups),
+        #              }
         self.dirty = True
-        for wall in self.walls.itervalues():
+        for wall in self.walls: #.itervalues():
             if wall.direction == DIRS['north']:
                 wall.rect.width = self.rect.width
                 wall.rect.height = self.rect.height * self.opts.wall_rect_thickness
@@ -147,8 +152,8 @@ class MapCell(pg.sprite.DirtySprite):
         #             max(1, self.opts.gridline_thickness * self.opts.cell_height))
         
         dirty_rects = []
-        for wall in self.walls.itervalues():
-            dirty_rects.append(wall.draw(surface)) #, left=wall.rect.left, top=wall.rect.top))
+        #for wall in self.walls: #.itervalues():
+        #    dirty_rects.append(wall.draw(surface)) #, left=wall.rect.left, top=wall.rect.top))
 
         if self.dirty:
             dirty_rects.append(my_rect)
@@ -182,8 +187,8 @@ class Map(pg.sprite.LayeredDirty):
                 cell = MapCell(self.opts, (x, y), (loc_x, loc_y), self, *groups)
                 #self.map[x].append(cell)
                 #self.add(cell)
-                #for wall in cell.walls:
-                #    self.add(wall)
+                for wall in cell.walls:
+                    self.add(wall)
 
     def draw(self, surface):
         """Draw the entire map."""
@@ -199,7 +204,7 @@ class Map(pg.sprite.LayeredDirty):
             #                                   self.opts.cellWidth),
             #                    top=(self.offsetTop + y *
             #                         self.opts.cellHeight))
-            if cell.coords[0] == 0 and cell.coords[1] == 0:
+            if isinstance(cell, MapCell) and cell.coords[0] == 0 and cell.coords[1] == 0:
                 DATA_DUMP = True
             else:
                 DATA_DUMP = False
