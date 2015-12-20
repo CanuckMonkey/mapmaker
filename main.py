@@ -69,11 +69,17 @@ def main():
         prepare.overlay.fill((0, 0, 0, 0))
         #prepare.the_map.draw(prepare.screen)
         dirty_rects.extend(prepare.the_map.draw(prepare.overlay))
+        mouse_pos = pg.mouse.get_pos()
+        for sprite in prepare.the_map:
+            if sprite.rect.collidepoint(mouse_pos):
+                dirty_rects.append(sprite.hover(prepare.overlay))
         #dirty_rects.add(prepare.the_map.draw(prepare.overlay))
         prepare.screen.blit(prepare.overlay, (0, 0))
 
+        
         # *After* drawing everything, update the display
         pg.display.update(dirty_rects)
+        #pg.display.update()
 
         pg.display.set_caption(prepare.ORIGINAL_CAPTION+
                                "     FPS: {}".format(clock.get_fps()))

@@ -22,10 +22,12 @@ class Wall(pg.sprite.DirtySprite):
         self.data = data
         self.rect = pg.Rect(0, 0, 0, 0)
         self.opts = opts
+        self.layer = 1
 
     def hover(self, surface):
         highlight = pg.Surface((self.rect.w, self.rect.h))
         highlight.fill((255, 255, 255, 127))
+        self.dirty = 1
         rect = surface.blit(highlight, self.rect)
         return rect
     
@@ -62,7 +64,7 @@ class Wall(pg.sprite.DirtySprite):
             pass # TODO add code to scale size of non-square image
         my_rect = surface.blit(temp_surf, (left, top))
         #my_rect = surface.blit(temp_surf, self.rect)
-        self.appearance = temp_surf
+        self.image = temp_surf
 
         if self.dirty:
             return my_rect
@@ -122,6 +124,8 @@ class MapCell(pg.sprite.DirtySprite):
             #    wall.data = WALL_TYPE['door']
             self.walls['n'].data = WALL_TYPE['door']
 
+    def hover(self, surface):
+        return self.rect
 
     def draw(self, surface, left=0, top=0):
         """Draw the MapCell onto the surface."""
