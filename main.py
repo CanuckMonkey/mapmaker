@@ -65,14 +65,16 @@ def main():
 
         # Draw/render
         dirty_rects = []
-        #dirty_rects = pg.sprite.LayeredDirty()
         prepare.overlay.fill((0, 0, 0, 0))
         #prepare.the_map.draw(prepare.screen)
+        #dirty_rects = prepare.the_map.draw(prepare.overlay)
         dirty_rects.extend(prepare.the_map.draw(prepare.overlay))
         mouse_pos = pg.mouse.get_pos()
         for sprite in prepare.the_map:
             if sprite.rect.collidepoint(mouse_pos):
                 dirty_rects.extend(sprite.hover(prepare.overlay))
+                #dirty_rects.append(sprite.hover(prepare.overlay))
+                #sprite.hover(prepare.overlay)
         #dirty_rects.add(prepare.the_map.draw(prepare.overlay))
         prepare.screen.blit(prepare.overlay, (0, 0))
 

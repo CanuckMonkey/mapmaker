@@ -21,6 +21,8 @@ class Wall(pg.sprite.DirtySprite):
         self.direction = direction
         self.data = data
         self.rect = pg.Rect(0, 0, 0, 0)
+        self.image = pg.Surface((self.rect.w, self.rect.h))
+        self.image.fill((0, 0, 0, 0))
         self.opts = opts
         self.layer = 1
 
@@ -28,8 +30,10 @@ class Wall(pg.sprite.DirtySprite):
         #highlight = pg.Surface((self.rect.w, self.rect.h))
         #highlight.fill((255, 255, 255, 127))
         self.dirty = 1
+        #pg.draw.rect(self.image, (255, 255, 255, 63), self.rect)
         pg.draw.rect(surface, (255, 255, 255, 63), self.rect)
         #print('Hovering')
+        #surface.blit(self.image, self.rect)
         return self.rect
         #rect = surface.blit(highlight, self.rect)
         #return rect
@@ -97,6 +101,8 @@ class MapCell(pg.sprite.DirtySprite):
         self.width = opts.cell_width
         self.height = opts.cell_height
         self.rect = pg.Rect(self.topleft, (self.width, self.height))
+        self.image = pg.Surface((self.rect.w, self.rect.h))
+        self.image.fill((0, 0, 0, 0))
         self.walls = [Wall(self.opts, DIRS['north'], *groups),
                       Wall(self.opts, DIRS['east'], *groups),
                       Wall(self.opts, DIRS['south'], *groups),
@@ -149,6 +155,7 @@ class MapCell(pg.sprite.DirtySprite):
         bgcolour = self.opts.bgcolours[self.explored]
 
         #my_rect = pg.draw.rect(surface, bgcolour, (left, top, self.width, self.height))
+        self.image = surface.fill(bgcolour, self.rect)
         my_rect = surface.fill(bgcolour, self.rect)
         #pg.draw.rect(surface, COLORS['ltgrey'], my_rect,
         #             max(1, self.opts.gridline_thickness * self.opts.cell_height))
@@ -199,6 +206,7 @@ class Map(pg.sprite.LayeredDirty):
         if self.opts.wraparound:
             self.offset_top += self.opts.wraparound_repeat * self.opts.cell_height
             self.offset_left += self.opts.wraparound_repeat * self.opts.cell_width
+        #dirty_rects = super(Map, self).draw(surface)
         dirty_rects = []
         for cell in self.sprites():
             dirty_rects.extend(cell.draw(surface))
