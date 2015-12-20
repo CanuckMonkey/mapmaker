@@ -30,6 +30,7 @@ class Wall(pg.sprite.DirtySprite):
         self.dirty = 1
         rect = surface.blit(highlight, self.rect)
         return rect
+        print('Hovering')
     
     def draw(self, surface, left=(), top=()):
         """Draw the wall to surface."""
@@ -125,6 +126,7 @@ class MapCell(pg.sprite.DirtySprite):
             self.walls['n'].data = WALL_TYPE['door']
 
     def hover(self, surface):
+        print('Cell Hover')
         return self.rect
 
     def draw(self, surface, left=0, top=0):
@@ -177,8 +179,11 @@ class Map(pg.sprite.LayeredDirty):
             for y in range(self.num_cells_y):
                 loc_x = self.offset_left + x * opts.cell_width
                 loc_y = self.offset_top + y * opts.cell_height
-                self.map[x].append(MapCell(self.opts, coords=(x, y), topleft=(loc_x, loc_y)))
-                self.add(self.map[x][y])
+                cell = MapCell(self.opts, (x, y), (loc_x, loc_y), self, *groups)
+                #self.map[x].append(cell)
+                #self.add(cell)
+                #for wall in cell.walls:
+                #    self.add(wall)
 
     def draw(self, surface):
         """Draw the entire map."""
@@ -188,15 +193,25 @@ class Map(pg.sprite.LayeredDirty):
             self.offset_top += self.opts.wraparound_repeat * self.opts.cell_height
             self.offset_left += self.opts.wraparound_repeat * self.opts.cell_width
         dirty_rects = []
-        for x in range(self.num_cells_x):
-            for y in range(self.num_cells_y):
-                dirty_rects.extend(self.map[x][y].draw(surface))
-                #self.map[x][y].draw(surface, left=(self.offsetLeft + x *
-                #                                   self.opts.cellWidth),
-                #                    top=(self.offsetTop + y *
-                #                         self.opts.cellHeight))
-                if x == 0 and y == 0:
-                    DATA_DUMP = True
-                else:
-                    DATA_DUMP = False
+        for cell in self.sprites():
+            dirty_rects.extend(cell.draw(surface))
+            #self.map[x][y].draw(surface, left=(self.offsetLeft + x *
+            #                                   self.opts.cellWidth),
+            #                    top=(self.offsetTop + y *
+            #                         self.opts.cellHeight))
+            if cell.coords[0] == 0 and cell.coords[1] == 0:
+                DATA_DUMP = True
+            else:
+                DATA_DUMP = False
+        #for x in range(self.num_cells_x):
+        #    for y in range(self.num_cells_y):
+        #        dirty_rects.extend(self.map[x][y].draw(surface))
+        #        #self.map[x][y].draw(surface, left=(self.offsetLeft + x *
+        #        #                                   self.opts.cellWidth),
+        #        #                    top=(self.offsetTop + y *
+        #        #                         self.opts.cellHeight))
+        #        if x == 0 and y == 0:
+        #            DATA_DUMP = True
+        #        else:
+        #            DATA_DUMP = False
         return dirty_rects
