@@ -78,8 +78,8 @@ def main():
 
         
         # *After* drawing everything, update the display
-        pg.display.update() #dirty_rects)
-        #pg.display.update()
+        #pg.display.update(dirty_rects)
+        pg.display.update()
 
         pg.display.set_caption(prepare.ORIGINAL_CAPTION+
                                "     FPS: {}".format(clock.get_fps()))
