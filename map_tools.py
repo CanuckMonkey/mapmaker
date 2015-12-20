@@ -25,12 +25,14 @@ class Wall(pg.sprite.DirtySprite):
         self.layer = 1
 
     def hover(self, surface):
-        highlight = pg.Surface((self.rect.w, self.rect.h))
-        highlight.fill((255, 255, 255, 127))
+        #highlight = pg.Surface((self.rect.w, self.rect.h))
+        #highlight.fill((255, 255, 255, 127))
         self.dirty = 1
-        rect = surface.blit(highlight, self.rect)
-        return rect
-        print('Hovering')
+        pg.draw.rect(surface, (255, 255, 255, 63), self.rect)
+        #print('Hovering')
+        return self.rect
+        #rect = surface.blit(highlight, self.rect)
+        #return rect
     
     def draw(self, surface, left=(), top=()):
         """Draw the wall to surface."""
@@ -131,7 +133,7 @@ class MapCell(pg.sprite.DirtySprite):
             self.walls['n'].data = WALL_TYPE['door']
 
     def hover(self, surface):
-        print('Cell Hover')
+        #print('Cell Hover')
         return self.rect
 
     def draw(self, surface, left=0, top=0):
