@@ -21,13 +21,22 @@ class Wall(pg.sprite.DirtySprite):
         self.direction = direction
         self.data = data
         self.rect = pg.Rect(0, 0, 0, 0)
+        self.image = pg.Surface((self.rect.w, self.rect.h))
+        self.image.fill((0, 0, 0, 0))
         self.opts = opts
+        self.layer = 1
 
     def hover(self, surface):
-        highlight = pg.Surface((self.rect.w, self.rect.h))
-        highlight.fill((255, 255, 255, 127))
-        rect = surface.blit(highlight, self.rect)
-        return rect
+        #highlight = pg.Surface((self.rect.w, self.rect.h))
+        #highlight.fill((255, 255, 255, 127))
+        self.dirty = 1
+        #pg.draw.rect(self.image, (255, 255, 255, 63), self.rect)
+        pg.draw.rect(surface, (222, 222, 222, 32), self.rect)
+        #print('Hovering')
+        #surface.blit(self.image, self.rect)
+        return self.rect
+        #rect = surface.blit(highlight, self.rect)
+        #return rect
     
     def draw(self, surface, left=(), top=()):
         """Draw the wall to surface."""
@@ -39,7 +48,7 @@ class Wall(pg.sprite.DirtySprite):
         temp_surf = pg.Surface((self.opts.cell_width,
                                 self.opts.cell_height *
                                 self.opts.wall_rect_thickness), 0, surface)
-        temp_surf.fill((255, 255, 255, 0))
+        temp_surf.fill((0, 0, 0, 0))
 
         if self.data == WALL_TYPE['door']:
             door_points = [(0, 0),
@@ -62,7 +71,7 @@ class Wall(pg.sprite.DirtySprite):
             pass # TODO add code to scale size of non-square image
         my_rect = surface.blit(temp_surf, (left, top))
         #my_rect = surface.blit(temp_surf, self.rect)
-        self.appearance = temp_surf
+        self.image = temp_surf
 
         if self.dirty:
             return my_rect
@@ -92,13 +101,20 @@ class MapCell(pg.sprite.DirtySprite):
         self.width = opts.cell_width
         self.height = opts.cell_height
         self.rect = pg.Rect(self.topleft, (self.width, self.height))
-        self.walls = {'n': Wall(self.opts, DIRS['north'], *groups),
-                      'e': Wall(self.opts, DIRS['east'], *groups),
-                      's': Wall(self.opts, DIRS['south'], *groups),
-                      'w': Wall(self.opts, DIRS['west'], *groups),
-                      }
+        self.image = pg.Surface((self.rect.w, self.rect.h))
+        self.image.fill((0, 0, 0, 0))
+        self.walls = [Wall(self.opts, DIRS['north'], *groups),
+                      Wall(self.opts, DIRS['east'], *groups),
+                      Wall(self.opts, DIRS['south'], *groups),
+                      Wall(self.opts, DIRS['west'], *groups),
+                      ]
+        #self.walls = {'n': Wall(self.opts, DIRS['north'], *groups),
+        #              'e': Wall(self.opts, DIRS['east'], *groups),
+        #              's': Wall(self.opts, DIRS['south'], *groups),
+        #              'w': Wall(self.opts, DIRS['west'], *groups),
+        #              }
         self.dirty = True
-        for wall in self.walls.itervalues():
+        for wall in self.walls: #.itervalues():
             if wall.direction == DIRS['north']:
                 wall.rect.width = self.rect.width
                 wall.rect.height = self.rect.height * self.opts.wall_rect_thickness
@@ -122,6 +138,14 @@ class MapCell(pg.sprite.DirtySprite):
             #    wall.data = WALL_TYPE['door']
             self.walls['n'].data = WALL_TYPE['door']
 
+    def hover(self, surface):
+        #print('Cell Hover')
+        self.dirty = 1
+        pg.draw.rect(surface, (127, 127, 127, 32),
+                     self.rect.inflate(-2 * (self.width * self.opts.wall_rect_thickness),
+                                       -2 * (self.height * self.opts.wall_rect_thickness))
+                     )
+        return self.rect
 
     def draw(self, surface, left=0, top=0):
         """Draw the MapCell onto the surface."""
@@ -136,13 +160,14 @@ class MapCell(pg.sprite.DirtySprite):
         bgcolour = self.opts.bgcolours[self.explored]
 
         #my_rect = pg.draw.rect(surface, bgcolour, (left, top, self.width, self.height))
+        self.image = surface.fill(bgcolour, self.rect)
         my_rect = surface.fill(bgcolour, self.rect)
         #pg.draw.rect(surface, COLORS['ltgrey'], my_rect,
         #             max(1, self.opts.gridline_thickness * self.opts.cell_height))
         
         dirty_rects = []
-        for wall in self.walls.itervalues():
-            dirty_rects.append(wall.draw(surface)) #, left=wall.rect.left, top=wall.rect.top))
+        #for wall in self.walls: #.itervalues():
+        #    dirty_rects.append(wall.draw(surface)) #, left=wall.rect.left, top=wall.rect.top))
 
         if self.dirty:
             dirty_rects.append(my_rect)
@@ -173,8 +198,11 @@ class Map(pg.sprite.LayeredDirty):
             for y in range(self.num_cells_y):
                 loc_x = self.offset_left + x * opts.cell_width
                 loc_y = self.offset_top + y * opts.cell_height
-                self.map[x].append(MapCell(self.opts, coords=(x, y), topleft=(loc_x, loc_y)))
-                self.add(self.map[x][y])
+                cell = MapCell(self.opts, (x, y), (loc_x, loc_y), self, *groups)
+                #self.map[x].append(cell)
+                #self.add(cell)
+                for wall in cell.walls:
+                    self.add(wall)
 
     def draw(self, surface):
         """Draw the entire map."""
@@ -183,16 +211,27 @@ class Map(pg.sprite.LayeredDirty):
         if self.opts.wraparound:
             self.offset_top += self.opts.wraparound_repeat * self.opts.cell_height
             self.offset_left += self.opts.wraparound_repeat * self.opts.cell_width
+        #dirty_rects = super(Map, self).draw(surface)
         dirty_rects = []
-        for x in range(self.num_cells_x):
-            for y in range(self.num_cells_y):
-                dirty_rects.extend(self.map[x][y].draw(surface))
-                #self.map[x][y].draw(surface, left=(self.offsetLeft + x *
-                #                                   self.opts.cellWidth),
-                #                    top=(self.offsetTop + y *
-                #                         self.opts.cellHeight))
-                if x == 0 and y == 0:
-                    DATA_DUMP = True
-                else:
-                    DATA_DUMP = False
+        for cell in self.sprites():
+            dirty_rects.extend(cell.draw(surface))
+            #self.map[x][y].draw(surface, left=(self.offsetLeft + x *
+            #                                   self.opts.cellWidth),
+            #                    top=(self.offsetTop + y *
+            #                         self.opts.cellHeight))
+            if isinstance(cell, MapCell) and cell.coords[0] == 0 and cell.coords[1] == 0:
+                DATA_DUMP = True
+            else:
+                DATA_DUMP = False
+        #for x in range(self.num_cells_x):
+        #    for y in range(self.num_cells_y):
+        #        dirty_rects.extend(self.map[x][y].draw(surface))
+        #        #self.map[x][y].draw(surface, left=(self.offsetLeft + x *
+        #        #                                   self.opts.cellWidth),
+        #        #                    top=(self.offsetTop + y *
+        #        #                         self.opts.cellHeight))
+        #        if x == 0 and y == 0:
+        #            DATA_DUMP = True
+        #        else:
+        #            DATA_DUMP = False
         return dirty_rects

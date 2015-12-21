@@ -9,7 +9,8 @@ import map_tools
 ORIGINAL_CAPTION = "MapMaker BT by CanuckMonkey Games"
 
 opts = options.Options()
-the_map = map_tools.Map(opts)
+all_sprites = pg.sprite.LayeredDirty()
+the_map = map_tools.Map(opts, all_sprites)
 
 screen_width = opts.cell_width * (the_map.num_cells_x + opts.wraparound_repeat *
                                  2 + opts.coord_display)
