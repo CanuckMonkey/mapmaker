@@ -31,7 +31,7 @@ class Wall(pg.sprite.DirtySprite):
         #highlight.fill((255, 255, 255, 127))
         self.dirty = 1
         #pg.draw.rect(self.image, (255, 255, 255, 63), self.rect)
-        pg.draw.rect(surface, (255, 255, 255, 63), self.rect)
+        pg.draw.rect(surface, (222, 222, 222, 32), self.rect)
         #print('Hovering')
         #surface.blit(self.image, self.rect)
         return self.rect
@@ -140,6 +140,11 @@ class MapCell(pg.sprite.DirtySprite):
 
     def hover(self, surface):
         #print('Cell Hover')
+        self.dirty = 1
+        pg.draw.rect(surface, (127, 127, 127, 32),
+                     self.rect.inflate(-2 * (self.width * self.opts.wall_rect_thickness),
+                                       -2 * (self.height * self.opts.wall_rect_thickness))
+                     )
         return self.rect
 
     def draw(self, surface, left=0, top=0):
